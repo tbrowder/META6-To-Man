@@ -1,0 +1,24 @@
+#!/usr/bin/env perl6
+
+use META6::To::Man;
+
+if !@*ARGS {
+   say qq:to/HERE/;
+
+   Usage: $*PROGRAM META6.json [options...]
+
+     Produces a POSIX 'man' page from data in the Perl 6 META6 file.  The
+     file is written to stdout if no options are used.  To produce the desired
+     file, the user will normally want to fine-tune the output file with or
+     more of the available options.
+
+   Options:
+
+     --out=F   Writes the man roff file to file 'F'.
+
+     --dir=D   The output is written to directory 'D'.
+   HERE
+   exit
+}
+
+meta6-to-man @*ARGS;
