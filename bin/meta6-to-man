@@ -14,9 +14,23 @@ if !@*ARGS {
 
    Options:
 
-     --out=F   Writes the man roff file to file 'F'.
+     --man=F         Writes the man roff file to file 'F'. It is an error if
+                     the file name does not end in .N where N is a digit in
+                     the range 1..8.
 
-     --dir=D   The output is written to directory 'D'.
+
+     --install       Installs the output file to one of the standard man
+                     directories. The directory actually chosen is the first
+                     one found with write privileges for the user.  The
+                     directories are searched in this order:
+
+                       /usr/share/man/manN
+                       /usr/local/share/man/manN
+                       /usr/local/man/manN
+
+     --install-to=D  Installs the output file to directory D.
+
+     --debug         Normally for developer use.
    HERE
    exit
 }
