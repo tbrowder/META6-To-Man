@@ -1,6 +1,6 @@
 {
     "perl"        : "6.c",
-    "name"        : "META6::To::Man",
+    "name"        : "My::Module",
     "version"     : "0.1.0",
     "description" : "Produces a rudimentary man page from a Perl 6 META6.json (or META.json) file.",
     "authors"     : [ "github:tbrowder" ],
@@ -16,12 +16,11 @@
 	"Test::META"
     ],
     "depends" : [
-	"Text::More",
-        "META6"
+	"Text::More"
     ],
     "resources" : [
     ],
     "tags" : [
-	"META6", "*NIX", "man page", "roff", "troff", "groff"
+	"META6", "POSIX", "man page", "roff", "troff", "groff"
     ]
 }

@@ -5,19 +5,23 @@ use META6::To::Man;
 if !@*ARGS {
    say qq:to/HERE/;
 
-   Usage: $*PROGRAM META6.json [options...]
+   Usage: $*PROGRAM --meta6=M --man=F [options...]
 
-     Produces a POSIX 'man' page from data in the Perl 6 META6 file.  The
-     file is written to stdout if no options are used.  To produce the desired
-     file, the user will normally want to fine-tune the output file with or
-     more of the available options.
+     Produces a *NIX 'man' page from data in the Perl 6 META6 file.  The
+     file is written to file 'F' where 'F' is the desired name (which
+     must be in a valid format--see below).  The META6.json file must be
+     a valid for Perl 6.
+
+   Mandatory arguments:
+
+     --meta6=M       Defines the desired META6.json file to be used. 'M' must be a
+                     valid META6 file.
+
+     --man=F         Defines the man roff file 'F'. It is an error if
+                     the file name does not end in '.N' where 'N' is a digit in
+                     the range '1..8'.
 
    Options:
-
-     --man=F         Writes the man roff file to file 'F'. It is an error if
-                     the file name does not end in .N where N is a digit in
-                     the range 1..8.
-
 
      --install       Installs the output file to one of the standard man
                      directories. The directory actually chosen is the first
