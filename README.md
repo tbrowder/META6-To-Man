@@ -38,4 +38,9 @@ Man page numbers most likely for Perl 6 modules (from man-pages(7) :
   + man(7)
   + man-pages(7)
 
-2. Writing man pages: https://liw.fi/manpages/ [https://liw.fi/manpages/]
+2. Writing man pages: https://liw.fi/manpages
+
+
+## COPYRIGHT
+
+Copyright (C) 2017 Thomas M. Browder, Jr. <<tom.browder@gmail.com>> (IRC #perl6: tbrowder)
