@@ -2,11 +2,12 @@ unit module META6::To::Man;
 
 use META6;
 
-# variables setbfrom input args
+# variables set from input args
+my $section;
 # mandatory args
 my $meta6      = 0; # META6 object
-my $man        = 0; # file name
 # options
+my $man        = 0; # file name
 my $debug      = 0; # 0 | 1
 my $install    = 0; # 0 | 1
 my $install-to = 0; # dir name
@@ -26,8 +27,6 @@ sub write-man-file($man) {
     my $license = $meta6.AT-KEY: 'license';
 
     my $supp    = $meta6.support;
-
-    #my $issues  = $meta6.AT-KEY: 'bugtracker';
     my $issues  = $supp.bugtracker;
 
     if $debug {
@@ -38,16 +37,43 @@ sub write-man-file($man) {
 	say "       \$license  = '$license'";
     }
 
-    # generate the man file as a string first
-    my $s = '';
+    # need a file name 
+    if !$man {
+        $section = 1;
+        $man = $name ~ ".$section";
+    }
 
+    my $date = '2017-09-20';
+    # generate the man file as a string first
+    my $s  = ".TH $title $section $date Perl6.org\n";
+
+    $s    ~= ".SH NAME $name\n";
+    $s    ~= "item \- $descrip\n";
+
+    $s    ~= ".SH SYNOPSIS\n";
+    $s    ~= "use $name;\n";
+
+    #$s    ~= ".SH DESCRIPTION\n";
+
+    $s    ~= ".SH BUGS\n";
+    $s    ~= "Submit bug reports to\n";
+    $s    ~= ".UR\n";
+    $s    ~= "$issues\n";
+    $s    ~= ".UE\n";
+    $s    ~= ".\n";
+
+    #$s    ~= ".SH SEE ALSO\n";
+
+    my $f = $man;
     if $install {
+        $f = "$install/$f";
     }
     elsif $install-to {
+        $f = "$install-to/$f";
+    }
 
-    }
-    else {
-    }
+    # write the file
+    spurt $f, $s;
 }
 
 sub check-meta6-value($val) {
@@ -85,9 +111,10 @@ sub check-install-to-value($val) {
 sub check-man-value($val) {
     # $val is the desired name of the man file. ensure it
     # has a valid file extension
-    if $val ~~ / '.' <[1..8>]> ** 1 $/ {
+    if $val ~~ / '.' (<[1..8>]> ** 1) $/ {
         # name is okay
         $man = $val;
+        $section = ~$0;
     }
     else {
         say "FATAL: Man name '$val' needs a number extension in the range '1..8'";
@@ -105,6 +132,7 @@ sub handle-args(@*ARGS) {
         }
         @args.append: $_;
     }
+
     for @args {
 	say "DEBUG: arg '$_'" if $debug;
 	my $val;
@@ -173,4 +201,11 @@ sub handle-args(@*ARGS) {
 	    exit 1;
         }
     }
-} # meta6-to-man
+
+    # one more check
+    if !$meta6 {
+	say "FATAL: Missing option '--meta6=M'.";
+        exit 1;
+    }
+
+} # handle-args
