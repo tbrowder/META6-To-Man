@@ -45,7 +45,7 @@ sub write-man-file($man) {
 
     my $date = '2017-09-20';
     # generate the man file as a string first
-    my $s  = ".TH $title $section $date Perl6.org\n";
+    my $s  = ".TH $name $section $date Perl6.org\n";
 
     $s    ~= ".SH NAME $name\n";
     $s    ~= "item \- $descrip\n";
@@ -79,12 +79,14 @@ sub write-man-file($man) {
 sub check-meta6-value($val) {
     # val is a valid META6.json file
     if !$val.IO.f {
-        say "FATAL: File '$val' doesn't exist.";
+        die "FATAL: File '$val' doesn't exist.";
+        #die "FATAL: File '$val' doesn't exist.\n";
         exit 1;
     }
     my $m = META6.new: :file($val);
     CATCH {
-        say "FATAL: File '$val' is not a valid META6 file.";
+        die "FATAL: File '$val' is not a valid META6 file.";
+        #die "FATAL: File '$val' is not a valid META6 file.\n";
         exit 1;
     }
     $meta6 = $m;
@@ -96,12 +98,14 @@ sub check-install-to-value($val) {
         my $f = "$val/.meta6-to-man";
         spurt $f, 'some text';
         CATCH {
-            say "FATAL: Unable to write to directory $val.";
+            die "FATAL: Unable to write to directory $val.";
+            #die "FATAL: Unable to write to directory $val.\n";
             exit 1;
         }
     }
     else {
-        say "FATAL: Directory $val doesn't exist.";
+        die "FATAL: Directory $val doesn't exist.";
+        #die "FATAL: Directory $val doesn't exist.\n";
         exit 1;
     }
 
@@ -117,7 +121,8 @@ sub check-man-value($val) {
         $section = ~$0;
     }
     else {
-        say "FATAL: Man name '$val' needs a number extension in the range '1..8'";
+        die "FATAL: Man name '$val' needs a number extension in the range '1..8'.";
+        #die "FATAL: Man name '$val' needs a number extension in the range '1..8'.\n";
         exit 1;
     }
 }
@@ -149,7 +154,8 @@ sub handle-args(@*ARGS) {
 	    $val = ~$1;
 	}
 	else {
-	    say "FATAL: Unknown arg '$_'";
+	    die "FATAL: Unknown arg '$_'.";
+	    #die "FATAL: Unknown arg '$_'.\n";
 	    exit 1;
 	}
 
@@ -189,22 +195,26 @@ sub handle-args(@*ARGS) {
             $install = 1;
         }
         default {
+            my $msg;
 	    if $val.defined {
-		say "FATAL: Unknown arg with value '{$_}={$val}'.";
+		 $msg = "FATAL: Unknown arg with value '{$_}={$val}'.";
 	    }
 	    elsif $need-value {
-		say "FATAL: Known arg '{$_}' also needs a value (e.g., 'arg=value').";
+		$msg = "FATAL: Known arg '{$_}' also needs a value (e.g., 'arg=value').";
 	    }
 	    else {
-		say "FATAL: Unknown arg '{$_}' with no value.";
+		$msg = "FATAL: Unknown arg '{$_}' with no value.";
 	    }
+            die "$msg";
+            #die "$msg\n";
 	    exit 1;
         }
     }
 
     # one more check
     if !$meta6 {
-	say "FATAL: Missing option '--meta6=M'.";
+	die "FATAL: Missing option '--meta6=M'.";
+	#die "FATAL: Missing option '--meta6=M'.\n";
         exit 1;
     }
 

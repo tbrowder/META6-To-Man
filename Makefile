@@ -1,6 +1,6 @@
 PERL6     := perl6
 # note LIBPATH uses normal PERL6LIB Perl 6 separators (',')
-LIBPATH   := lib,dev
+LIBPATH   := lib
 
 # set below to 1 for no effect, 1 for debugging messages
 DEBUG := MODULE_DEBUG=0
@@ -22,7 +22,7 @@ GOODTESTS := good-tests/*.t
 # the original test suite (i.e., 'make test')
 test:
 	for f in $(TESTS) ; do \
-	    $(DEBUG) $(TA) $(EARLYFAIL) PERL6LIB=$(LIBxdPATH) prove -v --exec=$(PERL6) $$f ; \
+	    $(DEBUG) $(TA) $(EARLYFAIL) PERL6LIB=$(LIBPATH) prove -v --exec=$(PERL6) $$f ; \
 	done
 
 bad:
