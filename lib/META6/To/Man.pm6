@@ -11,39 +11,54 @@ my $man        = 0; # file name
 my $debug      = 0; # 0 | 1
 my $install    = 0; # 0 | 1
 my $install-to = 0; # dir name
+my $date       = Date.today.Str; # default
+
+my $verbose    = 1; # default
+my $quiet      = 0; # if true, then $verbose is set to 0
 
 sub meta6-to-man(@*ARGS) is export {
     handle-args @*ARGS;
 
-    write-man-file $man;
-}
+    my $f = write-man-file $man;
 
-sub write-man-file($man) {
+    if $verbose {
+	say "Normal end.  See output file:";
+	say "  $f";
+    }
+
+} # meta6-to-man
+
+sub write-man-file($man is rw) {
 
     # extract data from the META6 file
-    my $descrip = $meta6.AT-KEY: 'description';
+
+    # mandatory: guaranteed to have these
+    my $version = $meta6.AT-KEY: 'version';
     my $name    = $meta6.AT-KEY: 'name';
+    my $descrip = $meta6.AT-KEY: 'description';
+
+    # optional per spec
     my $src-url = $meta6.AT-KEY: 'source-url';
     my $license = $meta6.AT-KEY: 'license';
 
     my $supp    = $meta6.support;
-    my $issues  = $supp.bugtracker;
+    my $bugs    = $supp.bugtracker;
 
     if $debug {
 	say "DEBUG: \$descrip  = '$descrip'";
 	say "       \$name     = '$name'";
 	say "       \$src-url  = '$src-url'";
-	say "       \$issues   = '$issues'";
+	say "       \$bugs     = '$bugs'";
 	say "       \$license  = '$license'";
     }
 
-    # need a file name 
+    # check required fields
+    # need a file name
     if !$man {
         $section = 1;
         $man = $name ~ ".$section";
     }
 
-    my $date = '2017-09-20';
     # generate the man file as a string first
     my $s  = ".TH $name $section $date Perl6.org\n";
 
@@ -53,14 +68,34 @@ sub write-man-file($man) {
     $s    ~= ".SH SYNOPSIS\n";
     $s    ~= "use $name;\n";
 
-    #$s    ~= ".SH DESCRIPTION\n";
+    $s    ~= ".SH DESCRIPTION\n";
+    $s    ~= "This module is in the Perl 6 ecosystem.\n";
+    if $src-url {
+	$s ~= "Its source can be found at\n";
+	$s    ~= ".UR\n";
+	$s    ~= "$src-url\n";
+	$s    ~= ".UE\n";
+	$s    ~= ".\n";
+    }
+    else {
+	$s ~= "However, its source location is unknown.\n";
+    }
 
     $s    ~= ".SH BUGS\n";
-    $s    ~= "Submit bug reports to\n";
-    $s    ~= ".UR\n";
-    $s    ~= "$issues\n";
-    $s    ~= ".UE\n";
-    $s    ~= ".\n";
+    if $bugs {
+	$s    ~= "Submit bug reports to\n";
+	$s    ~= ".UR\n";
+	$s    ~= "$bugs\n";
+	$s    ~= ".UE\n";
+	$s    ~= ".\n";
+    }
+    else {
+	$s    ~= "Submit bug reports to\n";
+	$s    ~= ".UR\n";
+	$s    ~= "$bugs\n";
+	$s    ~= ".UE\n";
+	$s    ~= ".\n";
+    }
 
     #$s    ~= ".SH SEE ALSO\n";
 
@@ -74,23 +109,41 @@ sub write-man-file($man) {
 
     # write the file
     spurt $f, $s;
-}
 
-sub check-meta6-value($val) {
+} # write-man-file
+
+sub check-date-value($val) {
+    # date should be in yyyy-mm-dd format
+    my $d = Date.new: $val;
+    CATCH {
+        default {
+	    say "FATAL: Date entry '$val' is not in YYYY-MM-DD format." if $verbose;
+	    exit 1;
+        }
+    }
+    $date = $d.Str;
+
+} # check-date-value
+
+sub check-meta6-value($val){
     # val is a valid META6.json file
     if !$val.IO.f {
-        die "FATAL: File '$val' doesn't exist.";
-        #die "FATAL: File '$val' doesn't exist.\n";
+        say "FATAL: File '$val' doesn't exist." if $verbose;
         exit 1;
     }
     my $m = META6.new: :file($val);
     CATCH {
-        die "FATAL: File '$val' is not a valid META6 file.";
-        #die "FATAL: File '$val' is not a valid META6 file.\n";
-        exit 1;
+        default {
+	    say "FATAL: File '$val' is not a valid META6 file." if $verbose;
+            exit 1;
+        }
     }
+
+    check-meta6-validity $m;
+
     $meta6 = $m;
-}
+
+} # check-meta6-value
 
 sub check-install-to-value($val) {
     # $val is a directory name the user must be able to write to
@@ -98,19 +151,19 @@ sub check-install-to-value($val) {
         my $f = "$val/.meta6-to-man";
         spurt $f, 'some text';
         CATCH {
-            die "FATAL: Unable to write to directory $val.";
-            #die "FATAL: Unable to write to directory $val.\n";
-            exit 1;
+            default {
+		say "FATAL: Unable to write to directory $val." if $verbose;
+		exit 1;
+            }
         }
     }
     else {
-        die "FATAL: Directory $val doesn't exist.";
-        #die "FATAL: Directory $val doesn't exist.\n";
+        say "FATAL: Directory $val doesn't exist." if $verbose;
         exit 1;
     }
 
     $install-to = $val;
-}
+} # check-install-to-value
 
 sub check-man-value($val) {
     # $val is the desired name of the man file. ensure it
@@ -121,11 +174,11 @@ sub check-man-value($val) {
         $section = ~$0;
     }
     else {
-        die "FATAL: Man name '$val' needs a number extension in the range '1..8'.";
-        #die "FATAL: Man name '$val' needs a number extension in the range '1..8'.\n";
+        say "FATAL: Man name '$val' needs a number extension in the range '1..8'." if $verbose;
         exit 1;
     }
-}
+
+} # check-man-value
 
 sub handle-args(@*ARGS) {
     # check for debug first
@@ -154,15 +207,13 @@ sub handle-args(@*ARGS) {
 	    $val = ~$1;
 	}
 	else {
-	    die "FATAL: Unknown arg '$_'.";
-	    #die "FATAL: Unknown arg '$_'.\n";
+	    say "FATAL: Unknown arg '$_'." if $verbose;
 	    exit 1;
 	}
 
 	if $debug {
 	    say "  DEBUG: good arg '$_'";
 	    say "  DEBUG: good val '$val'" if $val.defined;
-	    #say "DEBUG tmp next arg"; next;
 	}
 
 	#===== options with a value
@@ -185,6 +236,12 @@ sub handle-args(@*ARGS) {
 	    if !$val.defined { $need-value++; proceed }
             check-meta6-value $val;
 	}
+        when /:i ^ date  $ / {
+	    say "  DEBUG: inside when block, option = '$_'" if $debug;
+	    # skip if no value
+	    if !$val.defined { $need-value++; proceed }
+            check-date-value $val;
+	}
 
 	#===== options with NO value
         when /:i ^ install $ / {
@@ -193,6 +250,14 @@ sub handle-args(@*ARGS) {
 	    # skip if it has a value
 	    proceed if $val.defined;
             $install = 1;
+        }
+        when /:i ^ quiet $ / {
+	    # option with no value
+	    say "  DEBUG: inside when block, option = '$_'" if $debug;
+	    # skip if it has a value
+	    proceed if $val.defined;
+            $quiet = 1;
+            $verbose = !$quiet;
         }
         default {
             my $msg;
@@ -205,17 +270,49 @@ sub handle-args(@*ARGS) {
 	    else {
 		$msg = "FATAL: Unknown arg '{$_}' with no value.";
 	    }
-            die "$msg";
-            #die "$msg\n";
+            say "$msg" if $verbose;
 	    exit 1;
         }
     }
 
     # one more check
     if !$meta6 {
-	die "FATAL: Missing option '--meta6=M'.";
-	#die "FATAL: Missing option '--meta6=M'.\n";
+	say "FATAL: Missing option '--meta6=M'." if $verbose;
         exit 1;
     }
 
 } # handle-args
+
+sub check-meta6-validity(META6 $m, :$file?) is export {
+    # check for validity
+    my $err = 0;
+    my $msg = "ERROR:  META6 is missing mandatory key:";
+
+    # mandatory attributes per spec
+    for 'version', 'name', 'description' -> $k {
+        unless $m.AT-KEY($k) {
+            ++$err;
+            say "$msg $k";
+        }
+    }
+    =begin comment
+    # doesn't work as expected; I filed META6 issue #9
+    for 'version', 'name', 'description' -> $k {
+        unless $m.EXISTS-KEY($k) {
+            ++$err;
+            say "$msg $k";
+        }
+    }
+    =end comment
+
+    if $err {
+	if $file {
+            say "FATAL:  Invalid META6 file: $file" if $verbose;
+	}
+	else {
+            say "FATAL:  Invalid META6 file." if $verbose;
+	}
+        exit 1;
+    }
+
+} # check-meta6-validity

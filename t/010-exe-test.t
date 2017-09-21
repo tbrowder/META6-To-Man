@@ -4,42 +4,43 @@ use Test;
 use META6::To::Man;
 
 
-my $exe = '../bin/meta6-to-man';
-my $m   = './data/META6.json';
+my $exe = './bin/meta6-to-man';
+my $m   = './t/data/META6.json';
+my $m2  = './t/data/META6.json.invalid';
 
 
 # invalid args 
 my @bad = 
 "debug"
-, "-debug"
 , "--meta6"
 , "-meta6=$m"
+, "--date=687-8-12"
+, "--meta6=$m2"
 ;
 my $nbad = @bad.elems;;
 
 # valid args
 my @good = 
-"--debug"
-, "--meta6=$m"
+""
+, "--date=2017-09-09"
 ;
 my $ngood = @good.elems;;
 
-plan 2;
+plan $nbad + $ngood;
 
-subtest "invalid args ", {
-    plan $nbad;
 for @bad {
+    #my $cmd = "$exe $_ 1>/dev/null 2>/dev/null";
     my $cmd = "$exe $_";
-    dies-ok { $cmd };
-}
+    #note "args: $_";
+    dies-ok { shell $cmd }, "invalid args";
 }
 
-subtest "valid args", {
-    plan $ngood;
+# ensure valid args start with the mandatory arg
+$exe ~= " --meta6=$m";
 for @good {
     my $cmd = "$exe $_";
-    lives-ok { $cmd };
-}
+    #note "args: $_";
+    lives-ok { run $cmd.words }, "valid args";
 }
 
 

@@ -7,7 +7,7 @@ if !@*ARGS {
 
    Usage: $*PROGRAM --meta6=M [options...]
 
-     Produces a *NIX 'man' page from data in the Perl 6 META6 file 'M'.  
+     Produces a UNIX 'man' page from data in the Perl 6 META6 file 'M'.
      The output is written to file 'F.1' where 'F' is the name from the META6
      file (which can be changed with the '--man' option below).
 
@@ -29,10 +29,14 @@ if !@*ARGS {
 
      --install-to=D  Installs the output file to directory D.
 
+     --date=YYYY-MM-DD
+                     The default isbto ude the current date.
+
      --man=F         Defines the man roff file 'F'. It is an error if
                      the file name does not end in '.N' where 'N' is a digit in
                      the range '1..8'.
 
+     --quiet         Silences all messages. Normally for developer use.
 
      --debug         Normally for developer use.
    HERE

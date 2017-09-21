@@ -22,6 +22,7 @@ GOODTESTS := good-tests/*.t
 # the original test suite (i.e., 'make test')
 test:
 	for f in $(TESTS) ; do \
+            echo "=== running $$f..." ; \
 	    $(DEBUG) $(TA) $(EARLYFAIL) PERL6LIB=$(LIBPATH) prove -v --exec=$(PERL6) $$f ; \
 	done
 
