@@ -30,7 +30,7 @@ if !@*ARGS {
      --install-to=D  Installs the output file to directory D.
 
      --date=YYYY-MM-DD
-                     The default isbto ude the current date.
+                     The default is the current date.
 
      --man=F         Defines the man roff file 'F'. It is an error if
                      the file name does not end in '.N' where 'N' is a digit in

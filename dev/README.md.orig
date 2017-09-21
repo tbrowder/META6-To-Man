@@ -15,19 +15,18 @@ The output file should be a *NIX roff file. The default suffix number '1' may be
 
 ```perl6
 $ meta6-to-man
+Usage: ./bin/meta6-to-man META6.json [options...]
 
-Usage: ./bin/meta6-to-man --meta6=M [options...]
-
-  Produces a UNIX 'man' page from data in the Perl 6 META6 file 'M'.
-  The output is written to file 'F.1' where 'F' is the name from the META6
-  file (which can be changed with the '--man' option below).
-
-Mandatory argument:
-
-  --meta6=M       Defines the desired META6.json file to be used. 'M' must be a
-                  valid META6 file.
+  Produces a POSIX 'man' page from data in the Perl 6 META6 file.  The
+  file is written to stdout if no options are used.  To produce the desired
+  file, the user will normally want to fine-tune the output file with or
+  more of the available options.
 
 Options:
+
+  --man=F         Writes the man roff file to file 'F'. It is an error if
+                  the file name does not end in '.N' where 'N' is a digit in
+                  the range '1..8'.
 
   --install       Installs the output file to one of the standard man
                   directories. The directory actually chosen is the first
@@ -40,17 +39,7 @@ Options:
 
   --install-to=D  Installs the output file to directory D.
 
-  --date=YYYY-MM-DD
-                  The default is the current date.
-
-  --man=F         Defines the man roff file 'F'. It is an error if
-                  the file name does not end in '.N' where 'N' is a digit in
-                  the range '1..8'.
-
-  --quiet         Silences all messages. Normally for developer use.
-
   --debug         Normally for developer use.
-
 ```
 
 # MISCELLANEOUS
@@ -83,9 +72,6 @@ Man page numbers most likely for Perl 6 modules (from man-pages(7) :
 
 2. Writing man pages: https://liw.fi/manpages
 
-## LICENSE
-
-Artistic-2.0
 
 ## COPYRIGHT
 

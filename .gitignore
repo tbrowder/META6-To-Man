@@ -35,3 +35,5 @@ inc/
 /*.zip
 lib/.precomp
 release-tool.p6
+dev/README.md.middle
+My::Module.1
