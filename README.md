@@ -15,7 +15,6 @@ The output file should be a *NIX roff file. The default suffix number '1' may be
 
 ```perl6
 $ meta6-to-man
-
 Usage: ./bin/meta6-to-man --meta6=M [options...]
 
   Produces a UNIX 'man' page from data in the Perl 6 META6 file 'M'.

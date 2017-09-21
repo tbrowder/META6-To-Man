@@ -2,6 +2,10 @@ unit module META6::To::Man;
 
 use META6;
 
+constant NoWrite = 1;
+constant NoDir   = 2;
+constant DirOkay = 3;
+
 # variables set from input args
 my $section;
 # mandatory args
@@ -72,36 +76,42 @@ sub write-man-file($man is rw) {
     $s    ~= "This module is in the Perl 6 ecosystem.\n";
     if $src-url {
 	$s ~= "Its source can be found at\n";
-	$s    ~= ".UR\n";
-	$s    ~= "$src-url\n";
-	$s    ~= ".UE\n";
-	$s    ~= ".\n";
+	$s    ~= ".UR $src-url\n";
+	$s    ~= ".UE .\n";
     }
     else {
 	$s ~= "However, its source location is unknown.\n";
     }
 
     $s    ~= ".SH BUGS\n";
+    $s    ~= "Submit bug reports to\n";
     if $bugs {
-	$s    ~= "Submit bug reports to\n";
-	$s    ~= ".UR\n";
-	$s    ~= "$bugs\n";
-	$s    ~= ".UE\n";
-	$s    ~= ".\n";
+	$s    ~= ".UR $bugs\n";
+	$s    ~= ".UE .\n";
     }
     else {
-	$s    ~= "Submit bug reports to\n";
-	$s    ~= ".UR\n";
-	$s    ~= "$bugs\n";
-	$s    ~= ".UE\n";
-	$s    ~= ".\n";
+	$s    ~= "Perl 6 IRC channel #perl6.\n";
+    }
+
+    if $license {
+	$s    ~= ".SH LICENSE\n";
+	$s    ~= "$license\n";
     }
 
     #$s    ~= ".SH SEE ALSO\n";
 
     my $f = $man;
     if $install {
-        $f = "$install/$f";
+	# check the standard dirs
+	my $d = check-install-standard $section;
+	if $d {
+            $f = "$d/$f";
+	}
+	else {
+	    say "FATAL:  Unable to install to dir '$d'--check it exists with write privileges." if $verbose;
+	    exit 1;
+            #$f = "./$f";
+	}
     }
     elsif $install-to {
         $f = "$install-to/$f";
@@ -109,6 +119,7 @@ sub write-man-file($man is rw) {
 
     # write the file
     spurt $f, $s;
+    return $f;
 
 } # write-man-file
 
@@ -147,22 +158,20 @@ sub check-meta6-value($val){
 
 sub check-install-to-value($val) {
     # $val is a directory name the user must be able to write to
-    if $val.IO.d {
-        my $f = "$val/.meta6-to-man";
-        spurt $f, 'some text';
-        CATCH {
-            default {
-		say "FATAL: Unable to write to directory $val." if $verbose;
-		exit 1;
-            }
-        }
+    my $res = check-dir-write $val;
+
+    if $res == NoWrite  {
+	say "FATAL: Unable to write to directory $val." if $verbose;
+	exit 1;
     }
-    else {
+    elsif $res == NoDir {
         say "FATAL: Directory $val doesn't exist." if $verbose;
         exit 1;
     }
 
+    # must be okay
     $install-to = $val;
+
 } # check-install-to-value
 
 sub check-man-value($val) {
@@ -316,3 +325,42 @@ sub check-meta6-validity(META6 $m, :$file?) is export {
     }
 
 } # check-meta6-validity
+
+sub check-dir-write($dir --> UInt) {
+    if $dir.IO.d {
+        my $f = "$dir/.meta6-to-man";
+        spurt $f, 'some text';
+        CATCH {
+            default {
+		say "WARNING: Unable to write to directory $dir." if $verbose;
+		return NoWrite;
+            }
+        }
+	unlink $f;
+    }
+    else {
+        say "WARNING: Directory $dir doesn't exist." if $verbose;
+        return NoDir;
+    }
+
+    return DirOkay;
+} # check-dir-write
+
+sub check-install-standard($section --> Str) {
+    # check the Linux FHS standard locations
+    # and return the one to use, if any
+    my @fhs = [
+        "/usr/share/man/man{$section}",
+        "/usr/local/share/man/man{$section}",
+        "/usr/local/man/man{$section}",
+    ];
+
+    for @fhs -> $d {
+	my $res = check-dir-write $d;
+	return $d if $res == DirOkay;
+    }
+
+
+    return '';
+
+} # check-install-standard

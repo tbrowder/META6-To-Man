@@ -4,7 +4,6 @@ use META6::To::Man;
 
 if !@*ARGS {
    say qq:to/HERE/;
-
    Usage: $*PROGRAM --meta6=M [options...]
 
      Produces a UNIX 'man' page from data in the Perl 6 META6 file 'M'.

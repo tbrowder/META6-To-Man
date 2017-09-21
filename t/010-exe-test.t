@@ -9,19 +9,21 @@ my $m   = './t/data/META6.json';
 my $m2  = './t/data/META6.json.invalid';
 
 
-# invalid args 
-my @bad = 
+# invalid args
+my @bad =
 "debug"
 , "--meta6"
 , "-meta6=$m"
 , "--date=687-8-12"
 , "--meta6=$m2"
+, "--meta6=$m --install"
 ;
 my $nbad = @bad.elems;;
 
 # valid args
-my @good = 
+my @good =
 ""
+, "--install-to=/tmp"
 , "--date=2017-09-09"
 ;
 my $ngood = @good.elems;;
@@ -42,6 +44,3 @@ for @good {
     #note "args: $_";
     lives-ok { run $cmd.words }, "valid args";
 }
-
-
-
