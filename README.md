@@ -1,14 +1,15 @@
 # META6::To::Man  [![Build Status](https://travis-ci.org/tbrowder/META6-To-Man-Perl6.svg?branch=master)](https://travis-ci.org/tbrowder/META6-To-Man-Perl6)
 
-Produces a rudimentary *NIX man page from a Perl 6 META6.json (or META.json) file
+Produces a rudimentary UNIX man page from a Perl 6 META6.json (or META.json) file
 
 # SYNOPSIS
 
 ```perl6
-$ meta6-to-man META6.json > my-module.1
+$ meta6-to-man --meta6=./META6.json
 ```
 
-The output file should be a *NIX roff file. The default suffix number '1' may be changed by an option.
+The output file should be a UNIX roff file named '<name>.1' where
+'<name>' is the 'name' key value in the META6.json file.
 
 # USAGE
 
@@ -62,7 +63,7 @@ man -l <man src file name>.<number>
 Example:
 
 ```perl6
-man -l m-module.1
+man -l My::Module.1
 ```
 
 Man page numbers most likely for Perl 6 modules (from man-pages(7) :

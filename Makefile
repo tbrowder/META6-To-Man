@@ -36,14 +36,14 @@ good:
 	    $(DEBUG) $(TA) $(EARLYFAIL) PERL6LIB=$(LIBPATH) prove -v --exec=$(PERL6) $$f ; \
 	done
 
-dev/README.md.middle: ./bin/meta6-to-man
+
+
+readme: README.md
 
 # build the readme file
-README.md: ./bin/meta6-to-man
+README.md: ./bin/meta6-to-man ./dev/README.md.begin ./dev/README.md.end
 	@echo "Building a new README.md file..."
 	@perl6 -Ilib ./bin/meta6-to-man > dev/README.md.middle
 	@cat dev/README.md.begin  > ./README.md
 	@cat dev/README.md.middle >> ./README.md
 	@cat dev/README.md.end    >> ./README.md
-
-readme: README.md
