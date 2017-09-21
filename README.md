@@ -52,6 +52,14 @@ Options:
 
 ```
 
+The output from running:
+
+```
+perl6 -Ilib ./bin/meta6-to-man --meta6=./META6.json --install-to=./doc
+```
+
+in the top-level directory in this repository can be found [here](./doc/META6::To::Man.1).
+
 # MISCELLANEOUS
 
 View a local man page on a POSIX system (e.g., the one you just generated):
@@ -59,7 +67,7 @@ View a local man page on a POSIX system (e.g., the one you just generated):
 ```perl6
 man -l <man src file name>.<number>
 ```
-Example:
+Example (note 'l' is the lower-case letter 'ell'):
 
 ```perl6
 man -l My::Module.1
@@ -82,10 +90,10 @@ Man page numbers most likely for Perl 6 modules (from man-pages(7) :
 
 2. Writing man pages: https://liw.fi/manpages
 
-## LICENSE
+# LICENSE
 
 Artistic-2.0
 
-## COPYRIGHT
+# COPYRIGHT
 
 Copyright (C) 2017 Thomas M. Browder, Jr. <<tom.browder@gmail.com>> (IRC #perl6: tbrowder)

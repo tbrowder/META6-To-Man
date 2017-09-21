@@ -40,10 +40,14 @@ good:
 
 readme: README.md
 
-# build the readme file
+# build the readme file and a sample
 README.md: ./bin/meta6-to-man ./dev/README.md.begin ./dev/README.md.end
 	@echo "Building a new README.md file..."
 	@perl6 -Ilib ./bin/meta6-to-man > dev/README.md.middle
+	if [ !-d "./doc" ] ; then \
+           mkdir "./doc" ; \
+        fi
+	@perl6 -Ilib ./bin/meta6-to-man --meta6=./META6.json --install-to=./doc
 	@cat dev/README.md.begin  > ./README.md
 	@cat dev/README.md.middle >> ./README.md
 	@cat dev/README.md.end    >> ./README.md
