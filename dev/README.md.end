@@ -10,7 +10,7 @@ man -l <man src file name>.<number>
 Example:
 
 ```perl6
-man -l m-module.1
+man -l My::Module.1
 ```
 
 Man page numbers most likely for Perl 6 modules (from man-pages(7) :
