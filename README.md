@@ -13,7 +13,6 @@ The output file should be a UNIX roff file named '<name>.1' where
 
 # USAGE
 
-
 ```perl6
 $ meta6-to-man
 Usage: ./bin/meta6-to-man --meta6=M [options...]
