@@ -8,8 +8,8 @@ Produces a rudimentary UNIX man page from a Perl 6 META6.json (or META.json) fil
 $ meta6-to-man --meta6=./META6.json
 ```
 
-The output file should be a UNIX roff file named '<name>.1' where
-'<name>' is the 'name' key value in the META6.json file.
+The output file should be a UNIX roff file named '\<name\>.1' where
+'\<name\>' is the 'name' key value in the META6.json file.
 
 # USAGE
 
