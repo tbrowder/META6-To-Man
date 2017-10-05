@@ -1,9 +1,11 @@
 {
-    "perl"        : "6.c",
+    "perl"        : "6.*",
     "name"        : "META6::To::Man",
-    "version"     : "0.1.0",
+    "version"     : "0.2.0",
     "description" : "Produces a rudimentary man page from a Perl 6 META6.json (or META.json) file.",
-    "authors"     : [ "github:tbrowder" ],
+    "auth"        : "github:tbrowder",
+    "author"     : "github:tbrowder",
+    "authors"     : [ "Tom Browder <tom.browder@gmail.com>" ],
     "license"     : "Artistic-2.0",
     "source-url"  : "https://github.com/tbrowder/META6-To-Man-Perl6.git",
     "support"     : {
@@ -22,6 +24,6 @@
     "resources" : [
     ],
     "tags" : [
-	"META6", "*NIX", "man page", "roff", "troff", "groff"
+	"META6", "UNIX", "man page", "roff", "troff", "groff", "Linux", "man"
     ]
 }

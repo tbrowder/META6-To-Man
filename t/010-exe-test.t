@@ -31,16 +31,17 @@ my $ngood = @good.elems;;
 plan $nbad + $ngood;
 
 for @bad {
-    #my $cmd = "$exe $_ 1>/dev/null 2>/dev/null";
     my $cmd = "$exe $_";
-    #note "args: $_";
     dies-ok { shell $cmd }, "invalid args";
 }
 
 # ensure valid args start with the mandatory arg
 $exe ~= " --meta6=$m";
+my $man = 'example.1';
 for @good {
-    my $cmd = "$exe $_";
-    #note "args: $_";
+    my $cmd = "$exe $_ --man=$man";
     lives-ok { run $cmd.words }, "valid args";
 }
+
+# clean up
+unlink $man if $man.IO.f;

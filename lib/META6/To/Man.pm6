@@ -2,9 +2,7 @@ unit module META6::To::Man;
 
 use META6;
 
-constant NoWrite = 1;
-constant NoDir   = 2;
-constant DirOkay = 3;
+enum DirStat <NoWrite NoDir CanWrite>;
 
 # variables set from input args
 my $section;
@@ -127,10 +125,8 @@ sub check-date-value($val) {
     # date should be in yyyy-mm-dd format
     my $d = Date.new: $val;
     CATCH {
-        default {
-	    say "FATAL: Date entry '$val' is not in YYYY-MM-DD format." if $verbose;
-	    exit 1;
-        }
+        say "FATAL: Date entry '$val' is not in YYYY-MM-DD format." if $verbose;
+        exit 1;
     }
     $date = $d.Str;
 
@@ -144,10 +140,8 @@ sub check-meta6-value($val){
     }
     my $m = META6.new: :file($val);
     CATCH {
-        default {
-	    say "FATAL: File '$val' is not a valid META6 file." if $verbose;
-            exit 1;
-        }
+        say "FATAL: File '$val' is not a valid META6 file." if $verbose;
+        exit 1;
     }
 
     check-meta6-validity $m;
@@ -158,13 +152,13 @@ sub check-meta6-value($val){
 
 sub check-install-to-value($val) {
     # $val is a directory name the user must be able to write to
-    my $res = check-dir-write $val;
+    my $res = check-dir-status $val;
 
-    if $res == NoWrite  {
+    if $res ~~ NoWrite  {
 	say "FATAL: Unable to write to directory $val." if $verbose;
 	exit 1;
     }
-    elsif $res == NoDir {
+    elsif $res ~~ NoDir {
         say "FATAL: Directory $val doesn't exist." if $verbose;
         exit 1;
     }
@@ -326,25 +320,24 @@ sub check-meta6-validity(META6 $m, :$file?) is export {
 
 } # check-meta6-validity
 
-sub check-dir-write($dir --> UInt) {
+sub check-dir-status($dir --> DirStat) {
     if $dir.IO.d {
+        # dir exists, can the user write to it?
         my $f = "$dir/.meta6-to-man";
         spurt $f, 'some text';
         CATCH {
-            default {
-		say "WARNING: Unable to write to directory $dir." if $verbose;
-		return NoWrite;
-            }
+	    say "WARNING: Unable to write to directory $dir." if $verbose;
+	    return NoWrite;
         }
+        # write is okay, remove the evidence
 	unlink $f;
-    }
-    else {
-        say "WARNING: Directory $dir doesn't exist." if $verbose;
-        return NoDir;
+        return CanWrite;
     }
 
-    return DirOkay;
-} # check-dir-write
+    # if we got here the dir doesn't exist
+    say "WARNING: Directory $dir doesn't exist." if $verbose;
+    return NoDir;
+} # check-dir-status
 
 sub check-install-standard($section --> Str) {
     # check the Linux FHS standard locations
@@ -356,10 +349,9 @@ sub check-install-standard($section --> Str) {
     ];
 
     for @fhs -> $d {
-	my $res = check-dir-write $d;
-	return $d if $res == DirOkay;
+	my $res = check-dir-status $d;
+	return $d if $res ~~ CanWrite;
     }
-
 
     return '';
 

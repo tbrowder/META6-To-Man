@@ -52,7 +52,7 @@ Options:
 
 ```
 
-The output from running:
+The output troff file from running:
 
 ```
 perl6 -Ilib ./bin/meta6-to-man --meta6=./META6.json --install-to=./doc
